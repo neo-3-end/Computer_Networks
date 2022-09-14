@@ -7,78 +7,83 @@ public class HammingCode{
                 normal_num = normal_num * n;
             }
             return normal_num;
+    }
+    public static int odd_or_even(int[] x, int g){
+        int count = 0;
+        for(int i = 0; i < g; i++)
+        {
+            if(x[i] == 1)
+                count = count + 1;
         }
-        public static int odd_or_even(int x){
-            if(x%2 == 0)
-                return 0;
-            else
-                return 1;
-        }
+        if(count%2 == 0)
+            return 0;
+        else
+            return 1;
+    }
     public static void main(String args[]){
 	    Scanner s = new Scanner(System.in);
-	    int[] message = new int[7];
-        for(int i = 0; i < 7; i++){
+        int n;
+        System.out.println("Enter the number of bits of Hamming data: ");
+        n = s.nextInt();
+	    int[] message = new int[n];
+        for(int i = 0; i < n; i++){
             message[i] = s.nextInt();
         }
-        int[] reverse_of_message = new int[7];
-        for(int i = 6; i <= 0; i--){
-            reverse_of_message[i] = message[6 - i];
+        int[] reverse_of_message = new int[n];
+        for(int i = 0; i < n; i++){
+            reverse_of_message[i] = message[n - 1 - i];
         }
-        int[] hamming_data = new int[4];
-        for(int i = 0; i < 4; i++){
-            hamming_data[i] = s.nextInt();
+        int r = 1;
+        while(power(2, r) < (n + r + 1)){
+            r++;
         }
-        int r = 11;
-        int[] error_detection = new int[20];
-        for(int i = 0; i < r; i++){
+        int m = r + n;
+        int[] error_detection = new int[r + n];
+        for(int i = 0; i < m; i++){
             error_detection[i] = -1;
         }
-        int j = 0;
-        for(int i = 0; i < 4; i++){
-            int p;
-            p = power(2, i);
-            error_detection[p] = hamming_data[j];
-            j++;
-        }
-        int k = 6;
-        for(int i = 0; i < r; i++){
-            if(error_detection[i] == -1 && k >= 0){
-                error_detection[i] = message[k];
-                k = k - 1;
+        error_detection[0] = 0;
+        error_detection[1] = 0;
+        error_detection[3] = 0;
+        int k = 0;
+        for(int i = 0; i < m; i++){
+            if(error_detection[i] == -1 && k < n){
+                error_detection[i] = reverse_of_message[k];
+                k = k + 1;
             }
         }
-        int count_of_1 = 0;
-        for(int i = 0; i < r; i = i + 2){
-            if(error_detection[i] == 1)
-                count_of_1 = count_of_1 + 1;           
+        if(n == 4){
+            int[] p1 = new int[3];
+            int[] p2 = new int[3];
+            int[] p4 = new int[3];
+            p1[0] = error_detection[2];
+            p1[1] = error_detection[4];
+            p1[2] = error_detection[6];
+            p2[0] = error_detection[2];
+            p2[1] = error_detection[5];
+            p2[2] = error_detection[6];
+            p4[0] = error_detection[4];
+            p4[1] = error_detection[5];
+            p4[2] = error_detection[6];
+            error_detection[0] = odd_or_even(p1, 3);
+            error_detection[1] = odd_or_even(p2, 3);
+            error_detection[3] = odd_or_even(p4, 3);
         }
-        int p1 = odd_or_even(count_of_1);
-        count_of_1 = 0;
-        for(int i = 0; i < r; i = i + 4){
-            for(int u = i; u < (i + 2); u++){
-                if(error_detection[u] == 1)
-                    count_of_1 = count_of_1 + 1;
-            }           
+        else if(n == 3){
+            int[] p1 = new int[2];
+            int[] p2 = new int[2];
+            int[] p4 = new int[2];
+            p1[0] = error_detection[2];
+            p1[1] = error_detection[4];
+            p2[0] = error_detection[2];
+            p2[1] = error_detection[5];
+            p4[0] = error_detection[4];
+            p4[1] = error_detection[5];
+            error_detection[0] = odd_or_even(p1, 2);
+            error_detection[1] = odd_or_even(p2, 2);
+            error_detection[3] = odd_or_even(p4, 2);
         }
-        int p2 = odd_or_even(count_of_1);
-        count_of_1 = 0;
-        for(int i = 3; i < r; i = i + 8){
-            for(int v = i; v < (i + 4); v++){
-                if(error_detection[v] == 1)
-                    count_of_1 = count_of_1 + 1;
-            }
-        }
-        int p4 = odd_or_even(count_of_1);
-        count_of_1 = 0;
-        p1 = p1 * power(2, 0);
-        p2 = p2 * power(2, 1);
-        p4 = p4 * power(2, 2);
-        int error_index = p1 + p2 + p4;
-        if(error_detection[error_index] == 1)
-            error_detection[error_index] = 0;
-        else
-            error_detection[error_index] = 1;
-        for(int i = 0; i < 11; i++){
+        for(int i = 0; i < m; i++ ){
             System.out.print(error_detection[i]);
         }
     }
