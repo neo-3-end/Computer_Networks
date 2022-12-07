@@ -1,0 +1,405 @@
+//hamming code
+#include<stdio.h>
+#include<math.h>
+int main() {
+    int p, q[30], r, a = 0, d1;
+    printf("Enter the No.of Bits for hamming code :- \n");
+    scanf("%d",&p);
+    while (p + a + 1 > pow(2, a)){
+        a++;
+    }
+    for (int i = 1; i <=p; i++){
+        printf("Enter a bit number %d\n",i);
+        scanf("%d",&q[i]);
+    }
+    printf("Entered Bits:- \n");
+    for (int i = 1; i <= p; ++i){
+        printf("%d",q[i]);
+    }
+    printf("\n");
+    int data[p + a];
+    r = 0;
+    d1 = 1;
+    for (int i = 1; i <= p + a; ++i){
+        if ((i) == pow (2, r)){
+            data[i] = 0;
+            ++r;
+        }
+        else{
+            data[i] = q[d1];
+            ++d1;
+        }
+    }
+    printf("Output of this code is :- \n");
+    for (int i = 1; i <= p + a; ++i){ 
+        printf("%d",data[i]);
+        d1 = 0;
+    }
+    printf("\n");
+    int min, max = 0, parity, s, j;
+    for (int i = 1; i <= p + a; i = pow (2, d1)){
+        ++d1;
+        parity = 0;
+        j = i;
+        s = i;
+        min = 1;
+        max = i;
+        for (j; j <= p + a;){
+            for (s = j; max >= min && s <= p + a; ++min, ++s){
+                if (data[s] == 1)
+                parity++;
+            }
+            j = s + i;
+            min = 1;
+        }
+        if (parity % 2 == 0){
+            data[i] = 0;
+        }
+        else{
+            data[i] = 1;
+        }
+    }
+    printf("Bits for every even parity is :- \n");
+    for (int i = 1; i <= p + a;i++){
+        printf("%d",data[i]);
+    }
+    printf("\n");
+    return 0;
+}
+
+
+//crc
+#include <iostream>
+#include <math.h>
+#include <cstring>
+using namespace std;
+char Xor(char a,char b){
+    if(a==b)
+        return '0';
+    else
+        return '1';
+}
+void CRC(char Data_word[], char Key[]){
+    int Data_len = strlen(Data_word);
+    int Key_len = strlen(Key);
+    for(int i=0;i<Key_len-1;i++){               
+        Data_word[Data_len+i]='0';
+    }
+    Data_word[Data_len+Key_len-1]='\0';
+    int Code_len = Data_len+Key_len-1;                
+    char Temp[20],Remainder[20];
+    for(int i=0;i<Key_len;i++)
+        Remainder[i]=Data_word[i];                     
+    for(int j=Key_len;j<=Code_len;j++){
+        for(int i=0;i<Key_len;i++)
+            Temp[i]=Remainder[i];                
+        if(Remainder[0]=='0'){
+            for(int i=0;i<Key_len-1;i++)
+                Remainder[i]=Temp[i+1];
+        }
+        else{    
+            for(int i=0;i<Key_len-1;i++)
+                Remainder[i]=Xor(Temp[i+1],Key[i+1]);
+        }
+        if(j!=Code_len)
+            Remainder[Key_len-1]=Data_word[j];        
+        else
+            Remainder[Key_len-1]='\0';
+    }
+    for(int i=0;i<Key_len-1;i++)
+        Data_word[Data_len+i]=Remainder[i];               
+    Data_word[Code_len]='\0';
+    cout<<"CRC="<<Remainder<<"\nDataword="<<Data_word;
+}
+int main(){
+    char Key[20],Data_word[20];
+    cout<<"Enter the Data word :- ";
+    cin>>Data_word;
+    cout<<"Enter the Key :- ";
+    cin>>Key;
+    CRC(Data_word,Key);                        
+    return 0;
+}
+
+
+//sliding window
+#include<bits/stdc++.h>
+
+#include<ctime>
+
+#define ll long long int
+using namespace std;
+
+void transmission(ll & i, ll & N, ll & tf, ll & tt) {
+  while (i <= tf) {
+    int z = 0;
+    for (int k = i; k < i + N && k <= tf; k++) {
+      cout << "Sending Frame " << k << "..." << endl;
+      tt++;
+    }
+    for (int k = i; k < i + N && k <= tf; k++) {
+      int f = rand() % 2;
+      if (!f) {
+        cout << "Acknowledgment for Frame " << k << "..." << endl;
+        z++;
+      } else {
+        cout << "Timeout!! Frame Number : " << k << " Not Received" << endl;
+        cout << "Retransmitting Window..." << endl;
+        break;
+      }
+    }
+    cout << "\n";
+    i = i + z;
+  }
+}
+
+int main() {
+  ll tf, N, tt = 0;
+  srand(time(NULL));
+  cout << "Enter the Total number of frames : ";
+  cin >> tf;
+  cout << "Enter the Window Size : ";
+  cin >> N;
+  ll i = 1;
+  transmission(i, N, tf, tt);
+  cout << "Total number of frames which were sent and resent are : " << tt <<
+    endl;
+  return 0;
+}
+
+
+//dijkstra algorithm
+#include <stdio.h>
+#define INFINITY_VALUE 9999
+#define MAX_VALUE 10
+
+void process(int G[MAX_VALUE][MAX_VALUE], int n, int start);
+
+void process(int G[MAX_VALUE][MAX_VALUE], int n, int start) 
+{
+  int cost[MAX_VALUE][MAX_VALUE], distance[MAX_VALUE], prev[MAX_VALUE];
+  int visit[MAX_VALUE], count, minimum, nextnode, i, j;
+  for (i = 0; i < n; i++)
+    for (j = 0; j < n; j++)
+      if (G[i][j] == 0)
+        cost[i][j] = INFINITY_VALUE;
+      else
+        cost[i][j] = G[i][j];
+
+  for (i = 0; i < n; i++) {
+    distance[i] = cost[start][i];
+    prev[i] = start;
+    visit[i] = 0;
+  }
+
+  distance[start] = 0;
+  visit[start] = 1;
+  count = 1;
+
+  while (count < n - 1) {
+    minimum = INFINITY_VALUE;
+
+    for (i = 0; i < n; i++)
+      if (distance[i] < minimum && !visit[i]) {
+        minimum = distance[i];
+        nextnode = i;
+      }
+
+    visit[nextnode] = 1;
+    for (i = 0; i < n; i++)
+      if (!visit[i])
+        if (minimum + cost[nextnode][i] < distance[i]) {
+          distance[i] = minimum + cost[nextnode][i];
+          prev[i] = nextnode;
+        }
+    count++;
+  }
+
+  
+  for (i = 0; i < n; i++)
+    if (i != start) {
+      printf("\nsource->%d: %d", i, distance[i]);
+    }
+}
+
+int main() 
+{
+  int G[MAX_VALUE][MAX_VALUE], i, j, n, u,m;
+  printf("No.of Vertices: "); 
+  scanf("%d",&n); 
+  for(int i=0;i<n;i++) 
+  { 
+    for(int j=0;j<n;j++) 
+    {  
+      printf("G[%d][%d]: ",i,j); 
+      scanf("%d",&m); 
+      G[i][j]=m; 
+      } 
+      printf("\n"); 
+    }
+  printf("Source: ");
+  scanf("%d",&u);
+  process(G, n, u);
+
+  return 0;
+}
+
+//dijkstra 2
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+int n,r;
+struct frame{
+          char ack;
+          int data;
+}frm[10];
+
+int sender (void);
+void recvied_acknowledgement (void);
+void resend_selective_repeat (void);
+void resend_go_back (void);
+void goback(void);
+void selective(void);
+int main()
+{
+        int c;
+        do
+        {
+        printf("\n\n1.selective repeat ARQ\n2.Goback ARQ\n3.exit");
+        printf("\nEnter your choice:");
+        scanf("%d",&c);
+        switch(c)
+		 {		
+           case 1:selective();
+           break;
+           case 2:goback();      
+           break;
+           case 3:exit(0);
+           break;
+         }
+	   }
+	   while(c>=4);
+}
+void goback()
+{
+
+sender ();
+recvied_acknowledgement();
+resend_go_back();
+printf("\nAll frames sent successfully");
+}
+void selective()
+{
+
+sender();
+recvied_acknowledgement();
+resend_selective_repeat();
+printf("\nA11 frames sent successfully");
+}
+int sender()
+{
+        int i;
+        printf("\nEnter the no. of frames to be sent:");
+        scanf("%d" ,&n);
+         for (i=1;i<=n;i++)
+		 {
+                printf("\nEnter data for frames [%d] : ",i);
+                scanf("%d",&frm[i].data);
+                frm[i].ack= 'y';
+         }
+ return 0;
+}
+void recvied_acknowledgement()
+{
+   int i,rand;
+   printf("Enter any frame number: ");
+   scanf("%d",&rand);
+   r=rand%2;
+
+   frm[r].ack='n';
+   for(i=r;i<=n;i++)
+    {
+       if (frm[i].ack=='n')
+	   printf("\nThe frame number %d is not received\n",r);
+    }
+}
+ 
+void resend_selective_repeat()
+{
+printf("\nresending frame %d",r);
+frm[r].ack='y';
+printf("\nThe received frame is %d",frm[r].data);
+}
+   
+
+void resend_go_back()
+{
+int i;
+printf("\nresending from frame %d",r);
+    for(i=r;i<n;i++)
+     {
+       frm[i].ack='y';
+       printf("\nReceived data of frame %d is %d",i,frm[i].data);
+     }
+}
+
+//dijkstra 3
+#include<bits/stdc++.h>
+using namespace std;
+#define size 7
+int minimumDistance(int distance[],bool visited[]){
+    int min = INT_MAX;
+    int min_index=INT_MAX;
+    for(int i=0;i<size;i++){
+        if(!visited[i]&&distance[i]<=min){
+            min = distance[i];
+            min_index = i;
+        }
+    }
+    return min_index;
+}
+void printParentPath(int parent[], int i){
+    if(parent[i]==-1){
+        return;
+    }
+    printParentPath(parent,parent[i]);
+    cout<<i+1<<" ";
+}
+void dijkstra(int graph[size][size],int source){
+    int distance[size];
+    bool visited[size];
+    int parent[size];
+    for(int i=0;i<size;i++){
+        parent[0]=-1;
+        distance[i]=INT_MAX;
+        visited[i]=false;
+    }
+    distance[source]=0;
+    for(int i=0;i<size-1;i++){
+        int U = minimumDistance(distance,visited);
+        visited[U]=true;
+        for(int j=0;j<size;j++){
+            int curr_distance = distance[U]+graph[U][j];
+            if(!visited[j]&&graph[U][j]&&curr_distance<distance[j]){
+                parent[j]=U;
+                distance[j]=curr_distance;
+            }
+        }
+    }
+    cout<<"vertex\tDistance\tpath"<<endl;
+    for(int i=1;i<size;i++){
+        cout<<source+1<<"->"<<i+1<<"\t\t"<<distance[i]<<"\t\t"<<source+1<<" ";
+        printParentPath(parent,i);
+        cout<<endl;
+    }
+}
+int main(){
+    int graph[size][size]={{1,3,7,4,0,0,0},
+    {1,0,3,0,0,7,0},
+    {5,9,0,0,0,0,3},
+    {5,0,0,0,4,0,0},
+    {0,0,0,4,0,0,0},
+    {0,3,0,0,0,0,6},
+    {0,0,0,0,4,6,0}};
+    dijkstra(graph,0);
+}
